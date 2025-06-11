@@ -1,120 +1,57 @@
-# Injeção de Dependência em Windows Forms
+# Injeção de Dependência em WPF
 
-Este repositório demonstra como implementar o padrão de Injeção de Dependência (Dependency Injection) em aplicações Windows Forms utilizando C#. O objetivo é apresentar boas práticas de arquitetura, tornando o código mais flexível, testável e de fácil manutenção.
+Este repositório apresenta um exemplo prático de como implementar o padrão de Injeção de Dependência (Dependency Injection) em aplicações WPF utilizando C#. O objetivo é demonstrar como desacoplar componentes da interface gráfica dos serviços de aplicação, promovendo testabilidade, manutenção e organização do código.
 
 ## ✨ Visão Geral
 
-A injeção de dependência facilita a separação de responsabilidades e o desacoplamento entre as classes de sua aplicação. Com ela, você pode trocar facilmente implementações, promover testes automatizados e manter seu projeto preparado para crescer de forma sustentável.
+A Injeção de Dependência é uma técnica essencial para manter o código modular e facilitar a troca de implementações sem alterar a lógica principal da aplicação. No contexto do WPF, ela permite que janelas e componentes recebam suas dependências de forma automática, utilizando um container de DI.
 
 ## 📂 Estrutura do Projeto
 
 ```
-InjecaoDependenciaWinForms/
-├── .gitattributes
-├── .gitignore
-├── Form1.Designer.cs      # Código gerado pelo designer do formulário
-├── Form1.cs               # Formulário principal, recebe dependências pelo construtor
-├── Form1.resx             # Recursos do formulário
-├── InjecaoDependenciaWinForms.csproj
-├── InjecaoDependenciaWinForms.sln
-├── Program.cs             # Ponto de entrada e configuração do DI
+InjecaoDependenciaWPF/
+├── App.xaml               
+├── App.xaml.cs            # Configuração inicial da aplicação e do container de DI
+├── MainWindow.xaml        
+├── MainWindow.xaml.cs     # Janela principal, recebe dependências via construtor
+├── InjecaoDependenciaWPF.csproj
 └── Services/
     ├── IMessageService.cs # Interface do serviço de mensagens
     └── MessageService.cs  # Implementação concreta do serviço de mensagens
 ```
 
-## 🧑‍💻 Passo a Passo para Implementar Dependency Injection
+## 🛠️ Como Implementar Dependency Injection no WPF
 
-### 1. Defina Interfaces e Serviços
+### 1. Crie Interfaces e Serviços
 
-No diretório `Services`, você encontra a interface e a implementação do serviço:
+Implemente as interfaces dos serviços dentro do diretório `Services`. Por exemplo, um serviço de mensagens pode ser definido por meio de uma interface e uma implementação concreta.
 
-- `Services/IMessageService.cs`  
-  ```csharp
-  public interface IMessageService
-  {
-      void ShowMessage(string message);
-  }
-  ```
-- `Services/MessageService.cs`  
-  ```csharp
-  public class MessageService : IMessageService
-  {
-      public void ShowMessage(string message)
-      {
-          MessageBox.Show(message);
-      }
-  }
-  ```
+### 2. Configure o Container de DI
 
-### 2. Configure o Container de Injeção
+No arquivo `App.xaml.cs`, configure o container de dependências (por exemplo, usando `Microsoft.Extensions.DependencyInjection`) e registre os serviços e janelas principais.
 
-No arquivo `Program.cs`, registre as dependências e inicialize o formulário principal usando o provider:
+### 3. Injete Dependências nas Views
 
-```csharp
-using InjecaoDependenciaWinForms.Services;
-using Microsoft.Extensions.DependencyInjection;
-
-static class Program
-{
-    [STAThread]
-    static void Main()
-    {
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-
-        var services = new ServiceCollection();
-        services.AddScoped<IMessageService, MessageService>();
-        services.AddScoped<Form1>();
-
-        using (ServiceProvider serviceProvider = services.BuildServiceProvider())
-        {
-            Application.Run(serviceProvider.GetRequiredService<Form1>());
-        }
-    }
-}
-```
-
-### 3. Injete as Dependências no Formulário
-
-No `Form1.cs`, receba o serviço via construtor:
-
-```csharp
-public partial class Form1 : Form
-{
-    private readonly IMessageService _messageService;
-
-    public Form1(IMessageService messageService)
-    {
-        InitializeComponent();
-        _messageService = messageService;
-    }
-
-    private void button1_Click(object sender, EventArgs e)
-    {
-        _messageService.ShowMessage("Olá, DI no WinForms!");
-    }
-}
-```
+Utilize o construtor das suas Views para receber as dependências registradas no container. No WPF, isso permite associar os serviços diretamente à interface gráfica.
 
 ## ▶️ Como Executar
 
 1. Clone este repositório.
-2. Abra a solução `InjecaoDependenciaWinForms.sln` no Visual Studio.
-3. Certifique-se de restaurar os pacotes NuGet.
-4. Compile e execute (F5).
+2. Abra a solução no Visual Studio.
+3. Restaure os pacotes NuGet.
+4. Compile e execute a aplicação.
 
 ## 📦 Dependências
 
-As principais dependências estão descritas em `InjecaoDependenciaWinForms.csproj`:
+As principais dependências utilizadas são:
 
-- `Microsoft.Extensions.DependencyInjection`
-- `System.Windows.Forms` (parte do .NET Desktop)
+- `Microsoft.Extensions.DependencyInjection` para o gerenciamento do container de DI.
+- `System.Windows` (WPF), parte do .NET Desktop.
 
 ## 📚 Referências
 
-- [Dependency Injection .NET - Microsoft Docs](https://docs.microsoft.com/pt-br/dotnet/core/extensions/dependency-injection)
-- [Windows Forms Overview](https://learn.microsoft.com/pt-br/dotnet/desktop/winforms/overview/)
+- [Dependency Injection em .NET (Microsoft Docs)](https://learn.microsoft.com/pt-br/dotnet/core/extensions/dependency-injection)
+- [Introdução ao WPF](https://learn.microsoft.com/pt-br/dotnet/desktop/wpf/getting-started/)
 - [Microsoft.Extensions.DependencyInjection NuGet](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection/)
 
 ---
